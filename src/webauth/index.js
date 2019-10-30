@@ -47,7 +47,7 @@ export default class WebAuth {
             clientId,
             scope: scope.toString(),
             responseType: 'code id_token',
-            response_mode: 'query', // 'query' is unsafe and not supported, the hash fragment is also default
+            //response_mode: 'query', // 'query' is unsafe and not supported, the hash fragment is also default
             nonce: nonce,
             code_challenge_method: 'plain',
             code_challenge: verifier
