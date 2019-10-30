@@ -52,6 +52,9 @@ export default class WebAuth {
             code_challenge_method: 'plain',
             code_challenge: verifier
         }
+
+        console.log("requestParams", requestParams)
+
         const loginUrl = this.client.loginUrl(requestParams)
 
         let redirectUrl = await agent.openWeb(loginUrl)
