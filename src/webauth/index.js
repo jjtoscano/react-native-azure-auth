@@ -3,6 +3,7 @@ import url from 'url'
 import AuthError from '../auth/authError'
 import Scope from '../token/scope'
 import BaseTokenItem from '../token/baseTokenItem'
+import { Base64 } from 'js-base64'
 
 /**
  * Helper to perform Auth against Azure AD login page
@@ -29,6 +30,7 @@ export default class WebAuth {
    * In iOS it will use `SFSafariViewController` and in Android `Chrome Custom Tabs`.
    *
    * @param {Object} options parameters to send
+   * @param {String} [options.state] random string to prevent CSRF attacks.
    * @param {String} [options.scope] scopes requested for the issued tokens. 
    *    OpenID Connect scopes are always added to every request. `openid profile offline_access`
    *    @see https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-v2-scopes
@@ -40,30 +42,31 @@ export default class WebAuth {
         const scope = new Scope(options.scope)
 
         const { clientId, client, agent } = this
-        const {nonce, state, verifier} = await agent.generateRequestParams()
+        const {nonce, _state, verifier} = await agent.generateRequestParams()
 
+        const state = typeof options.state !== 'undefined' ? options.state : _state
         let requestParams = {
             ...options,
             clientId,
             scope: scope.toString(),
             responseType: 'code id_token',
-            response_mode: 'form_post',
             nonce: nonce,
             code_challenge_method: 'plain',
             code_challenge: verifier
         }
 
-        console.log("requestParams", requestParams)
+        console.log('requestParams', requestParams)
 
         const loginUrl = this.client.loginUrl(requestParams)
 
         let redirectUrl = await agent.openWeb(loginUrl)
 
-        if (!redirectUrl || !redirectUrl.startsWith(client.redirectUri)) {
+        let bundleRedirectUrl = Base64.decode(state)
+        if (!redirectUrl || !redirectUrl.startsWith(bundleRedirectUrl)) {
             throw new AuthError({
                 json: {
                     error: 'a0.redirect_uri.not_expected',
-                    error_description: `Expected ${client.redirectUri} but got ${redirectUrl}`
+                    error_description: `Expected ${bundleRedirectUrl} but got ${redirectUrl}`
                 },
                 status: 0
             })
