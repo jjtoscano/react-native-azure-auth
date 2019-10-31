@@ -32,7 +32,7 @@ export default class Auth {
 
 
         this.client = new Client(options)
-        const { clientId, redirectUri, persistentCache } = options
+        const { clientId, redirectUri, persistentCache, bundleRedirectUri } = options
         if (!clientId) {
             throw new Error('Missing clientId in parameters')
         }
@@ -40,6 +40,7 @@ export default class Auth {
         this.authorityUrl = this.client.baseUrl
         this.clientId = clientId
         this.redirectUri = redirectUri || defaultRedirectUri
+        this.bundleRedirectUri = bundleRedirectUri
     }
 
     /**
@@ -116,7 +117,7 @@ export default class Auth {
             .post('token', 
                 {...payload, 
                     client_id: this.clientId, 
-                    redirect_uri: this.redirectUri,
+                    redirect_uri: payload.useBundleRedirect ? this.bundleRedirectUri : this.redirectUri,
                     grant_type: 'authorization_code'})
             .then(responseHandler)
     }
