@@ -32,7 +32,7 @@ export default class Auth {
 
 
         this.client = new Client(options)
-        const { clientId, redirectUri, persistentCache, bundleRedirectUri } = options
+        const { clientId, redirectUri, persistentCache } = options
         if (!clientId) {
             throw new Error('Missing clientId in parameters')
         }
@@ -40,7 +40,6 @@ export default class Auth {
         this.authorityUrl = this.client.baseUrl
         this.clientId = clientId
         this.redirectUri = redirectUri || defaultRedirectUri
-        this.bundleRedirectUri = bundleRedirectUri
     }
 
     /**
@@ -97,6 +96,7 @@ export default class Auth {
    * @param {Object} input input used to obtain tokens from a code
    * @param {String} input.code code returned by `/authorize`.
    * @param {String} input.redirectUri original redirectUri used when calling `/authorize`.
+   * @param {String} input.useBundleRedirect original redirectUri used when calling `/authorize`.
    * @param {String} input.scope A space-separated list of scopes. 
    *    The scopes requested in this leg must be equivalent to or a subset of the scopes requested in the first leg
    * @returns {Promise}
@@ -117,7 +117,7 @@ export default class Auth {
             .post('token', 
                 {...payload, 
                     client_id: this.clientId, 
-                    redirect_uri: payload.useBundleRedirect ? this.bundleRedirectUri : this.redirectUri,
+                    redirect_uri: this.redirectUri,
                     grant_type: 'authorization_code'})
             .then(responseHandler)
     }

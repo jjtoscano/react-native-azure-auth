@@ -32,7 +32,6 @@ export default class WebAuth {
    * @param {Object} options parameters to send
    * @param {String} [options.state] random string to prevent CSRF attacks.
    * @param {String} [options.scope] scopes requested for the issued tokens. 
-   * @param {String} [options.useBundleRedirect] scopes requested for the issued tokens. 
    *    OpenID Connect scopes are always added to every request. `openid profile offline_access`
    *    @see https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-v2-scopes
    * @returns {Promise<BaseTokenItem | AccessTokenItem>}
@@ -94,12 +93,11 @@ export default class WebAuth {
                 status: 0
             })
         }
-        
+
         const tokenResponse = await client.exchange({
             code, 
             scope: scope.toString(), 
-            code_verifier: verifier,
-            useBundleRedirect: options.useBundleRedirect
+            code_verifier: verifier
         })
 
         if (tokenResponse.refreshToken) {
