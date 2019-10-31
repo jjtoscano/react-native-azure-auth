@@ -84,7 +84,7 @@ export default class WebAuth {
             throw new AuthError({json: urlHashParsed, status: 0})
         }
 
-        if (resultState !== decodeState) {
+        if (resultState !== state) {
             throw new AuthError({
                 json: {
                     error: 'a0.state.invalid',
