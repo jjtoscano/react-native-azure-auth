@@ -55,18 +55,16 @@ export default class WebAuth {
             code_challenge: verifier
         }
 
-        console.log('requestParams', requestParams)
-
         const loginUrl = this.client.loginUrl(requestParams)
 
         let redirectUrl = await agent.openWeb(loginUrl)
 
-        let bundleRedirectUrl = Base64.decode(state)
-        if (!redirectUrl || !redirectUrl.startsWith(bundleRedirectUrl)) {
+        let decodeState = Base64.decode(state)
+        if (!redirectUrl || !redirectUrl.startsWith(decodeState)) {
             throw new AuthError({
                 json: {
                     error: 'a0.redirect_uri.not_expected',
-                    error_description: `Expected ${bundleRedirectUrl} but got ${redirectUrl}`
+                    error_description: `Expected ${decodeState} but got ${redirectUrl}`
                 },
                 status: 0
             })
@@ -86,7 +84,7 @@ export default class WebAuth {
             throw new AuthError({json: urlHashParsed, status: 0})
         }
 
-        if (resultState !== state) {
+        if (resultState !== decodeState) {
             throw new AuthError({
                 json: {
                     error: 'a0.state.invalid',
