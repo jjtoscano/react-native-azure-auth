@@ -59,12 +59,11 @@ export default class WebAuth {
 
         let redirectUrl = await agent.openWeb(loginUrl)
 
-        let decodeState = Base64.decode(state)
-        if (!redirectUrl || !redirectUrl.startsWith(decodeState)) {
+        if (!redirectUrl || !redirectUrl.startsWith(client.redirectUri)) {
             throw new AuthError({
                 json: {
                     error: 'a0.redirect_uri.not_expected',
-                    error_description: `Expected ${decodeState} but got ${redirectUrl}`
+                    error_description: `Expected ${client.redirectUri} but got ${redirectUrl}`
                 },
                 status: 0
             })
